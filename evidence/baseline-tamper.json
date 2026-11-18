@@ -1,0 +1,30 @@
+{
+  "baseline_id": "aacb53c358074cc1ab8e17509520e735",
+  "starting_read": {
+    "status": 200,
+    "record": {
+      "id": "aacb53c358074cc1ab8e17509520e735",
+      "tenant_id": "B",
+      "name": "B-config-v2",
+      "sha256": "2b6a23336f0ac9fc60654a411b5b223a9c748df817436e4fbb67ac1ba98a4450",
+      "created_at": "2026-11-18T13:35:07.147+00:00"
+    }
+  },
+  "test": "Changed the stored SHA-256 without changing its HMAC tag and verified the forged digest.",
+  "forged_digest": "453920da34f3e53333d39ef24990313480cbe6e0b5247e890a85f91064cdee8b",
+  "tampered": {
+    "status": 409,
+    "json": {
+      "error": "baseline_integrity_failed",
+      "decision": "reject"
+    }
+  },
+  "after_restoring_digest": {
+    "status": 200,
+    "json": {
+      "decision": "allow",
+      "baseline_id": "aacb53c358074cc1ab8e17509520e735"
+    }
+  },
+  "result": "PASS"
+}

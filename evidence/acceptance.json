@@ -1,0 +1,625 @@
+{
+  "started_utc": "2026-11-18T13:35:07.049901+00:00",
+  "base_url": "http://127.0.0.1:8080",
+  "results": {
+    "normal": "PASS: both tenants created, retrieved and listed their own baseline. Clean digest = 200 allow. Changed digest = 422 reject.",
+    "isolation": "PASS: A received 404 for read and verify. B received 200 before and after, with an identical record.",
+    "limit": "PASS: A reached 2/2. A\u2019s third create returned 409 and stayed at 2/2. B\u2019s third create returned 201 and reached 3/5."
+  },
+  "exchanges": [
+    {
+      "check": "health",
+      "request": {
+        "method": "GET",
+        "path": "/health",
+        "tenant_credential": null,
+        "json": null
+      },
+      "expected_http": 200,
+      "response": {
+        "status": 200,
+        "json": {
+          "status": "ok"
+        }
+      }
+    },
+    {
+      "check": "auth",
+      "request": {
+        "method": "GET",
+        "path": "/v1/baselines",
+        "tenant_credential": null,
+        "json": null
+      },
+      "expected_http": 401,
+      "response": {
+        "status": 401,
+        "json": {
+          "error": "invalid_token"
+        }
+      }
+    },
+    {
+      "check": "auth",
+      "request": {
+        "method": "POST",
+        "path": "/v1/baselines",
+        "tenant_credential": "A",
+        "json": {
+          "name": "spoofed-config",
+          "sha256": "2b6a23336f0ac9fc60654a411b5b223a9c748df817436e4fbb67ac1ba98a4450",
+          "tenant_id": "B"
+        }
+      },
+      "expected_http": 400,
+      "response": {
+        "status": 400,
+        "json": {
+          "error": "invalid_fields",
+          "expected": [
+            "name",
+            "sha256"
+          ]
+        }
+      }
+    },
+    {
+      "check": "normal.initial",
+      "request": {
+        "method": "GET",
+        "path": "/v1/baselines",
+        "tenant_credential": "A",
+        "json": null
+      },
+      "expected_http": 200,
+      "response": {
+        "status": 200,
+        "json": {
+          "tenant_id": "A",
+          "organisation": "Neva Brewery Demo",
+          "plan": "Basic",
+          "limit": 2,
+          "used": 0,
+          "baselines": []
+        }
+      }
+    },
+    {
+      "check": "normal.create",
+      "request": {
+        "method": "POST",
+        "path": "/v1/baselines",
+        "tenant_credential": "A",
+        "json": {
+          "name": "A-camera-v1",
+          "sha256": "2b6a23336f0ac9fc60654a411b5b223a9c748df817436e4fbb67ac1ba98a4450"
+        }
+      },
+      "expected_http": 201,
+      "response": {
+        "status": 201,
+        "json": {
+          "id": "a124282eec574882aa2d366335fd2624",
+          "tenant_id": "A",
+          "name": "A-camera-v1",
+          "sha256": "2b6a23336f0ac9fc60654a411b5b223a9c748df817436e4fbb67ac1ba98a4450",
+          "created_at": "2026-11-18T13:35:07.088+00:00"
+        }
+      }
+    },
+    {
+      "check": "normal.read",
+      "request": {
+        "method": "GET",
+        "path": "/v1/baselines/a124282eec574882aa2d366335fd2624",
+        "tenant_credential": "A",
+        "json": null
+      },
+      "expected_http": 200,
+      "response": {
+        "status": 200,
+        "json": {
+          "id": "a124282eec574882aa2d366335fd2624",
+          "tenant_id": "A",
+          "name": "A-camera-v1",
+          "sha256": "2b6a23336f0ac9fc60654a411b5b223a9c748df817436e4fbb67ac1ba98a4450",
+          "created_at": "2026-11-18T13:35:07.088+00:00"
+        }
+      }
+    },
+    {
+      "check": "normal.list",
+      "request": {
+        "method": "GET",
+        "path": "/v1/baselines",
+        "tenant_credential": "A",
+        "json": null
+      },
+      "expected_http": 200,
+      "response": {
+        "status": 200,
+        "json": {
+          "tenant_id": "A",
+          "organisation": "Neva Brewery Demo",
+          "plan": "Basic",
+          "limit": 2,
+          "used": 1,
+          "baselines": [
+            {
+              "id": "a124282eec574882aa2d366335fd2624",
+              "tenant_id": "A",
+              "name": "A-camera-v1",
+              "sha256": "2b6a23336f0ac9fc60654a411b5b223a9c748df817436e4fbb67ac1ba98a4450",
+              "created_at": "2026-11-18T13:35:07.088+00:00"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "check": "normal.allow",
+      "request": {
+        "method": "POST",
+        "path": "/v1/baselines/a124282eec574882aa2d366335fd2624/verify",
+        "tenant_credential": "A",
+        "json": {
+          "sha256": "2b6a23336f0ac9fc60654a411b5b223a9c748df817436e4fbb67ac1ba98a4450"
+        }
+      },
+      "expected_http": 200,
+      "response": {
+        "status": 200,
+        "json": {
+          "decision": "allow",
+          "baseline_id": "a124282eec574882aa2d366335fd2624"
+        }
+      }
+    },
+    {
+      "check": "normal.reject",
+      "request": {
+        "method": "POST",
+        "path": "/v1/baselines/a124282eec574882aa2d366335fd2624/verify",
+        "tenant_credential": "A",
+        "json": {
+          "sha256": "ca8aa84895b28222d056c4b9101080a22e369ad44354e5dd497fc82a44981eec"
+        }
+      },
+      "expected_http": 422,
+      "response": {
+        "status": 422,
+        "json": {
+          "error": "digest_mismatch",
+          "decision": "reject"
+        }
+      }
+    },
+    {
+      "check": "normal.initial",
+      "request": {
+        "method": "GET",
+        "path": "/v1/baselines",
+        "tenant_credential": "B",
+        "json": null
+      },
+      "expected_http": 200,
+      "response": {
+        "status": 200,
+        "json": {
+          "tenant_id": "B",
+          "organisation": "Northline Beverages Demo",
+          "plan": "Pro",
+          "limit": 5,
+          "used": 0,
+          "baselines": []
+        }
+      }
+    },
+    {
+      "check": "normal.create",
+      "request": {
+        "method": "POST",
+        "path": "/v1/baselines",
+        "tenant_credential": "B",
+        "json": {
+          "name": "B-camera-v1",
+          "sha256": "2b6a23336f0ac9fc60654a411b5b223a9c748df817436e4fbb67ac1ba98a4450"
+        }
+      },
+      "expected_http": 201,
+      "response": {
+        "status": 201,
+        "json": {
+          "id": "1d59ecb22df6482bbce57a2faca5c5bd",
+          "tenant_id": "B",
+          "name": "B-camera-v1",
+          "sha256": "2b6a23336f0ac9fc60654a411b5b223a9c748df817436e4fbb67ac1ba98a4450",
+          "created_at": "2026-11-18T13:35:07.105+00:00"
+        }
+      }
+    },
+    {
+      "check": "normal.read",
+      "request": {
+        "method": "GET",
+        "path": "/v1/baselines/1d59ecb22df6482bbce57a2faca5c5bd",
+        "tenant_credential": "B",
+        "json": null
+      },
+      "expected_http": 200,
+      "response": {
+        "status": 200,
+        "json": {
+          "id": "1d59ecb22df6482bbce57a2faca5c5bd",
+          "tenant_id": "B",
+          "name": "B-camera-v1",
+          "sha256": "2b6a23336f0ac9fc60654a411b5b223a9c748df817436e4fbb67ac1ba98a4450",
+          "created_at": "2026-11-18T13:35:07.105+00:00"
+        }
+      }
+    },
+    {
+      "check": "normal.list",
+      "request": {
+        "method": "GET",
+        "path": "/v1/baselines",
+        "tenant_credential": "B",
+        "json": null
+      },
+      "expected_http": 200,
+      "response": {
+        "status": 200,
+        "json": {
+          "tenant_id": "B",
+          "organisation": "Northline Beverages Demo",
+          "plan": "Pro",
+          "limit": 5,
+          "used": 1,
+          "baselines": [
+            {
+              "id": "1d59ecb22df6482bbce57a2faca5c5bd",
+              "tenant_id": "B",
+              "name": "B-camera-v1",
+              "sha256": "2b6a23336f0ac9fc60654a411b5b223a9c748df817436e4fbb67ac1ba98a4450",
+              "created_at": "2026-11-18T13:35:07.105+00:00"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "check": "normal.allow",
+      "request": {
+        "method": "POST",
+        "path": "/v1/baselines/1d59ecb22df6482bbce57a2faca5c5bd/verify",
+        "tenant_credential": "B",
+        "json": {
+          "sha256": "2b6a23336f0ac9fc60654a411b5b223a9c748df817436e4fbb67ac1ba98a4450"
+        }
+      },
+      "expected_http": 200,
+      "response": {
+        "status": 200,
+        "json": {
+          "decision": "allow",
+          "baseline_id": "1d59ecb22df6482bbce57a2faca5c5bd"
+        }
+      }
+    },
+    {
+      "check": "normal.reject",
+      "request": {
+        "method": "POST",
+        "path": "/v1/baselines/1d59ecb22df6482bbce57a2faca5c5bd/verify",
+        "tenant_credential": "B",
+        "json": {
+          "sha256": "ca8aa84895b28222d056c4b9101080a22e369ad44354e5dd497fc82a44981eec"
+        }
+      },
+      "expected_http": 422,
+      "response": {
+        "status": 422,
+        "json": {
+          "error": "digest_mismatch",
+          "decision": "reject"
+        }
+      }
+    },
+    {
+      "check": "isolation.owner_before",
+      "request": {
+        "method": "GET",
+        "path": "/v1/baselines/1d59ecb22df6482bbce57a2faca5c5bd",
+        "tenant_credential": "B",
+        "json": null
+      },
+      "expected_http": 200,
+      "response": {
+        "status": 200,
+        "json": {
+          "id": "1d59ecb22df6482bbce57a2faca5c5bd",
+          "tenant_id": "B",
+          "name": "B-camera-v1",
+          "sha256": "2b6a23336f0ac9fc60654a411b5b223a9c748df817436e4fbb67ac1ba98a4450",
+          "created_at": "2026-11-18T13:35:07.105+00:00"
+        }
+      }
+    },
+    {
+      "check": "isolation.foreign_read",
+      "request": {
+        "method": "GET",
+        "path": "/v1/baselines/1d59ecb22df6482bbce57a2faca5c5bd",
+        "tenant_credential": "A",
+        "json": null
+      },
+      "expected_http": 404,
+      "response": {
+        "status": 404,
+        "json": {
+          "error": "baseline_not_found"
+        }
+      }
+    },
+    {
+      "check": "isolation.unknown_read",
+      "request": {
+        "method": "GET",
+        "path": "/v1/baselines/a6e12a08f81a4dd287d8b24cbffba240",
+        "tenant_credential": "A",
+        "json": null
+      },
+      "expected_http": 404,
+      "response": {
+        "status": 404,
+        "json": {
+          "error": "baseline_not_found"
+        }
+      }
+    },
+    {
+      "check": "isolation.foreign_verify",
+      "request": {
+        "method": "POST",
+        "path": "/v1/baselines/1d59ecb22df6482bbce57a2faca5c5bd/verify",
+        "tenant_credential": "A",
+        "json": {
+          "sha256": "2b6a23336f0ac9fc60654a411b5b223a9c748df817436e4fbb67ac1ba98a4450"
+        }
+      },
+      "expected_http": 404,
+      "response": {
+        "status": 404,
+        "json": {
+          "error": "baseline_not_found"
+        }
+      }
+    },
+    {
+      "check": "isolation.owner_after",
+      "request": {
+        "method": "GET",
+        "path": "/v1/baselines/1d59ecb22df6482bbce57a2faca5c5bd",
+        "tenant_credential": "B",
+        "json": null
+      },
+      "expected_http": 200,
+      "response": {
+        "status": 200,
+        "json": {
+          "id": "1d59ecb22df6482bbce57a2faca5c5bd",
+          "tenant_id": "B",
+          "name": "B-camera-v1",
+          "sha256": "2b6a23336f0ac9fc60654a411b5b223a9c748df817436e4fbb67ac1ba98a4450",
+          "created_at": "2026-11-18T13:35:07.105+00:00"
+        }
+      }
+    },
+    {
+      "check": "limit.a_second",
+      "request": {
+        "method": "POST",
+        "path": "/v1/baselines",
+        "tenant_credential": "A",
+        "json": {
+          "name": "A-config-v1",
+          "sha256": "2b6a23336f0ac9fc60654a411b5b223a9c748df817436e4fbb67ac1ba98a4450"
+        }
+      },
+      "expected_http": 201,
+      "response": {
+        "status": 201,
+        "json": {
+          "id": "eafbc74413334c88b5ce76abc00c81a2",
+          "tenant_id": "A",
+          "name": "A-config-v1",
+          "sha256": "2b6a23336f0ac9fc60654a411b5b223a9c748df817436e4fbb67ac1ba98a4450",
+          "created_at": "2026-11-18T13:35:07.129+00:00"
+        }
+      }
+    },
+    {
+      "check": "limit.a_before",
+      "request": {
+        "method": "GET",
+        "path": "/v1/baselines",
+        "tenant_credential": "A",
+        "json": null
+      },
+      "expected_http": 200,
+      "response": {
+        "status": 200,
+        "json": {
+          "tenant_id": "A",
+          "organisation": "Neva Brewery Demo",
+          "plan": "Basic",
+          "limit": 2,
+          "used": 2,
+          "baselines": [
+            {
+              "id": "a124282eec574882aa2d366335fd2624",
+              "tenant_id": "A",
+              "name": "A-camera-v1",
+              "sha256": "2b6a23336f0ac9fc60654a411b5b223a9c748df817436e4fbb67ac1ba98a4450",
+              "created_at": "2026-11-18T13:35:07.088+00:00"
+            },
+            {
+              "id": "eafbc74413334c88b5ce76abc00c81a2",
+              "tenant_id": "A",
+              "name": "A-config-v1",
+              "sha256": "2b6a23336f0ac9fc60654a411b5b223a9c748df817436e4fbb67ac1ba98a4450",
+              "created_at": "2026-11-18T13:35:07.129+00:00"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "check": "limit.a_third",
+      "request": {
+        "method": "POST",
+        "path": "/v1/baselines",
+        "tenant_credential": "A",
+        "json": {
+          "name": "A-config-v2",
+          "sha256": "2b6a23336f0ac9fc60654a411b5b223a9c748df817436e4fbb67ac1ba98a4450"
+        }
+      },
+      "expected_http": 409,
+      "response": {
+        "status": 409,
+        "json": {
+          "error": "plan_limit_reached",
+          "plan": "Basic",
+          "limit": 2,
+          "used": 2
+        }
+      }
+    },
+    {
+      "check": "limit.a_after",
+      "request": {
+        "method": "GET",
+        "path": "/v1/baselines",
+        "tenant_credential": "A",
+        "json": null
+      },
+      "expected_http": 200,
+      "response": {
+        "status": 200,
+        "json": {
+          "tenant_id": "A",
+          "organisation": "Neva Brewery Demo",
+          "plan": "Basic",
+          "limit": 2,
+          "used": 2,
+          "baselines": [
+            {
+              "id": "a124282eec574882aa2d366335fd2624",
+              "tenant_id": "A",
+              "name": "A-camera-v1",
+              "sha256": "2b6a23336f0ac9fc60654a411b5b223a9c748df817436e4fbb67ac1ba98a4450",
+              "created_at": "2026-11-18T13:35:07.088+00:00"
+            },
+            {
+              "id": "eafbc74413334c88b5ce76abc00c81a2",
+              "tenant_id": "A",
+              "name": "A-config-v1",
+              "sha256": "2b6a23336f0ac9fc60654a411b5b223a9c748df817436e4fbb67ac1ba98a4450",
+              "created_at": "2026-11-18T13:35:07.129+00:00"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "check": "limit.b_second",
+      "request": {
+        "method": "POST",
+        "path": "/v1/baselines",
+        "tenant_credential": "B",
+        "json": {
+          "name": "B-config-v1",
+          "sha256": "2b6a23336f0ac9fc60654a411b5b223a9c748df817436e4fbb67ac1ba98a4450"
+        }
+      },
+      "expected_http": 201,
+      "response": {
+        "status": 201,
+        "json": {
+          "id": "a2cdd11ffcb542e1b72dddc6a3b50824",
+          "tenant_id": "B",
+          "name": "B-config-v1",
+          "sha256": "2b6a23336f0ac9fc60654a411b5b223a9c748df817436e4fbb67ac1ba98a4450",
+          "created_at": "2026-11-18T13:35:07.139+00:00"
+        }
+      }
+    },
+    {
+      "check": "limit.b_third",
+      "request": {
+        "method": "POST",
+        "path": "/v1/baselines",
+        "tenant_credential": "B",
+        "json": {
+          "name": "B-config-v2",
+          "sha256": "2b6a23336f0ac9fc60654a411b5b223a9c748df817436e4fbb67ac1ba98a4450"
+        }
+      },
+      "expected_http": 201,
+      "response": {
+        "status": 201,
+        "json": {
+          "id": "aacb53c358074cc1ab8e17509520e735",
+          "tenant_id": "B",
+          "name": "B-config-v2",
+          "sha256": "2b6a23336f0ac9fc60654a411b5b223a9c748df817436e4fbb67ac1ba98a4450",
+          "created_at": "2026-11-18T13:35:07.147+00:00"
+        }
+      }
+    },
+    {
+      "check": "limit.b_after",
+      "request": {
+        "method": "GET",
+        "path": "/v1/baselines",
+        "tenant_credential": "B",
+        "json": null
+      },
+      "expected_http": 200,
+      "response": {
+        "status": 200,
+        "json": {
+          "tenant_id": "B",
+          "organisation": "Northline Beverages Demo",
+          "plan": "Pro",
+          "limit": 5,
+          "used": 3,
+          "baselines": [
+            {
+              "id": "1d59ecb22df6482bbce57a2faca5c5bd",
+              "tenant_id": "B",
+              "name": "B-camera-v1",
+              "sha256": "2b6a23336f0ac9fc60654a411b5b223a9c748df817436e4fbb67ac1ba98a4450",
+              "created_at": "2026-11-18T13:35:07.105+00:00"
+            },
+            {
+              "id": "a2cdd11ffcb542e1b72dddc6a3b50824",
+              "tenant_id": "B",
+              "name": "B-config-v1",
+              "sha256": "2b6a23336f0ac9fc60654a411b5b223a9c748df817436e4fbb67ac1ba98a4450",
+              "created_at": "2026-11-18T13:35:07.139+00:00"
+            },
+            {
+              "id": "aacb53c358074cc1ab8e17509520e735",
+              "tenant_id": "B",
+              "name": "B-config-v2",
+              "sha256": "2b6a23336f0ac9fc60654a411b5b223a9c748df817436e4fbb67ac1ba98a4450",
+              "created_at": "2026-11-18T13:35:07.147+00:00"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

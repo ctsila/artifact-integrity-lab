@@ -1,0 +1,5 @@
+Container: artifact-integrity-lab | Image: artifact-integrity-lab:1 | Up Less than a second
+Python 3.12.16
+SQLite 3.46.1
+uid=10001 gid=10001 groups=10001
+Health: {"status": "ok"}

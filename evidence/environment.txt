@@ -1,0 +1,14 @@
+Host: CC-PW56 on Oracle VirtualBox
+2026-11-18T13:35:03Z
+3.24.3
+Linux 6.18.58-0-virt x86_64
+Docker client=29.9.3 server=29.9.3
+Python 3.14.8
+Logical CPUs: 1
+              total        used        free      shared  buff/cache   available
+Mem:           1.9G      149.8M        1.6G      184.0K      221.1M        1.7G
+Swap:          1.9G           0        1.9G
+f926ccbb1cf2e7e9e4d596c307904c8973952024b9bd9192681778e105a422e4  service.py
+99e41ff1a3815580692072f6d9ac4986a45d126abb167a92708e020d82f1c747  Dockerfile
+56a909f11467009110ac3522dc58d5736238b3efaf63eb069a8a125d96fc2555  tools/acceptance.py
+6739cf0a701601e7aa3f9789c26a25a3ae112383a4067bce4c78100a61caa924  tools/probe_artifact.py

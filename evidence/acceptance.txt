@@ -1,0 +1,4 @@
+PASS: both tenants created, retrieved and listed their own baseline. Clean digest = 200 allow. Changed digest = 422 reject.
+PASS: A received 404 for read and verify. B received 200 before and after, with an identical record.
+PASS: A reached 2/2. A’s third create returned 409 and stayed at 2/2. B’s third create returned 201 and reached 3/5.
+Recorded 27 HTTP exchanges in local-evidence/acceptance.json

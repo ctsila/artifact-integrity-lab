@@ -1,0 +1,5 @@
+{
+  "artifact": "synthetic-camera-config",
+  "version": 1,
+  "confidence_threshold": 0.85
+}

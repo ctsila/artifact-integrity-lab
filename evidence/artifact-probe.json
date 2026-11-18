@@ -1,0 +1,21 @@
+{
+  "baseline_id": "f869ff96b4d6411c930ed8583c9ef3ff",
+  "trials": [
+    {
+      "trial": "original",
+      "sha256": "99df168d2f58eba44f90429c5dc43c65637463be5304b97d490306c6f1dcc4e7",
+      "http": 200,
+      "decision": "allow",
+      "error": null,
+      "round_trip_ms": 2.02
+    },
+    {
+      "trial": "changed",
+      "sha256": "1b0a000acff5367b597c9705a37b02eaef27713c35deac6274364a48fe711295",
+      "http": 422,
+      "decision": "reject",
+      "error": "digest_mismatch",
+      "round_trip_ms": 1.63
+    }
+  ]
+}
